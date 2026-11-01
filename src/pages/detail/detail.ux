@@ -47,7 +47,7 @@
 <style>
 .page {
   flex-direction: column;
-  background-color: #10121e;
+  background-color: #000000;
 }
 
 .scroll-area {
@@ -63,7 +63,7 @@
 .title {
   font-size: 32px;
   font-weight: bold;
-  color: #ffd75e;
+  color: #ffffff;
   text-align: center;
   margin-bottom: 10px;
 }
@@ -71,20 +71,24 @@
 .h {
   font-size: 24px;
   font-weight: bold;
-  color: #7ee787;
+  color: #ffffff;
   margin-top: 16px;
 }
 
 .p {
   font-size: 20px;
-  color: #cccccc;
+  color: #d8d8d8;
   margin-top: 6px;
 }
 
 .row {
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   margin-top: 8px;
+  padding: 14px 20px;
+  border-radius: 36px;
+  background-color: #262626;
 }
 
 .row-name {
@@ -94,18 +98,18 @@
 
 .row-val {
   font-size: 18px;
-  color: #999999;
+  color: #d8d8d8;
 }
 
 .btn {
-  width: 240px;
-  height: 46px;
+  width: 280px;
+  height: 60px;
   margin-top: 24px;
   margin-bottom: 24px;
-  border-radius: 23px;
-  background-color: #2a2d45;
+  border-radius: 33px;
+  background-color: #262626;
   font-size: 22px;
-  color: #ffffff;
+  color: #d8d8d8;
   text-align: center;
   align-self: center;
 }

@@ -81,6 +81,7 @@ npm run release    # 发布
 
 - 扑克牌图片：[hayeah/playing-cards-assets](https://github.com/hayeah/playing-cards-assets)（MIT © Howard Yeh）
 - 音效：[Kenney.nl](https://kenney.nl) *Casino Audio* / *Interface Sounds*（CC0）
+- UI 视觉规范：Vela 手表 UI 设计参考（组件规格表，提取记录见 [docs/DESIGN.md](./docs/DESIGN.md)；官方 UI 指南 [iot.mi.com/vela/quickapp](https://iot.mi.com/vela/quickapp/zh/guide/start/user-interface.html)）
 
 详见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 
