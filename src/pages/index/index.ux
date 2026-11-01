@@ -13,6 +13,7 @@
     <!-- 视图：对局 -->
     <div if="{{view === 'game'}}" class="view">
       <div class="info-row">
+        <input class="back-btn" type="button" value="返回" onclick="backToMenu" />
         <text class="info-text">盲注 {{round}}</text>
         <text class="info-text">出牌 {{handsLeft}}</text>
         <text class="info-text">弃牌 {{discardsLeft}}</text>
@@ -57,6 +58,7 @@
           <text class="choice-desc">{{$item.desc}}</text>
         </div>
       </div>
+      <input class="btn btn-plain btn-skip" type="button" value="跳过" onclick="skipReward" />
     </div>
 
     <!-- 视图：结算 -->
@@ -141,12 +143,29 @@
 .info-row {
   flex-direction: row;
   justify-content: space-between;
-  width: 360px;
+  align-items: center;
+  width: 372px;
 }
 
 .info-text {
   font-size: 20px;
   color: #d8d8d8;
+}
+
+.back-btn {
+  width: 68px;
+  height: 36px;
+  border-radius: 18px;
+  background-color: rgba(255, 255, 255, 0.06);
+  font-size: 17px;
+  color: #d8d8d8;
+  text-align: center;
+}
+
+.btn-skip {
+  width: 180px;
+  height: 50px;
+  margin-top: 14px;
 }
 
 .score-row {
@@ -214,6 +233,8 @@
 .joker-icon {
   width: 26px;
   height: 38px;
+  border-radius: 4px;
+  background-color: #ffffff;
 }
 
 .joker-empty {
@@ -240,6 +261,7 @@
   width: 62px;
   height: 90px;
   border-radius: 6px;
+  background-color: #ffffff;
 }
 
 .card-img-on {
@@ -293,6 +315,8 @@
 .choice-icon {
   width: 34px;
   height: 48px;
+  border-radius: 6px;
+  background-color: #ffffff;
 }
 
 .choice-text {
@@ -519,6 +543,18 @@ export default {
     audio.onerror = function () {
       audioBroken = true
     }
+  },
+
+  onBackPress() {
+    if (this.view === 'menu') {
+      return false
+    }
+    if (this.view === 'reward') {
+      this.skipReward()
+      return true
+    }
+    this.backToMenu()
+    return true
   },
 
   onDestroy() {
@@ -807,6 +843,12 @@ export default {
     if (this.scoring) return
     this.playSound('click')
     this.jokers.push({ id: item.id, name: item.name, desc: item.desc, icon: item.icon })
+    this.nextRound()
+  },
+
+  skipReward() {
+    if (this.scoring) return
+    this.playSound('click')
     this.nextRound()
   },
 
