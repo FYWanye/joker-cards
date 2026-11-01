@@ -1,0 +1,123 @@
+<template>
+  <div class="page">
+    <scroll scroll-y="true" class="scroll-area">
+      <div class="content">
+        <text class="title">玩法规则</text>
+
+        <text class="h">目标</text>
+        <text class="p">每轮盲注有一个目标分数。在出牌次数用完前累计达到目标即可过关，出牌耗尽则游戏结束。</text>
+
+        <text class="h">操作</text>
+        <text class="p">点击手牌选中（最多 5 张），出牌计分或弃牌重抽。每轮 4 次出牌、3 次弃牌。</text>
+
+        <text class="h">计分</text>
+        <text class="p">得分 =（基础筹码 + 牌面筹码）× 倍率。A=11，J/Q/K=10，其余为面值。</text>
+
+        <text class="h">牌型表</text>
+        <div class="row"><text class="row-name">高牌</text><text class="row-val">筹码 5 × 倍率 1</text></div>
+        <div class="row"><text class="row-name">对子</text><text class="row-val">筹码 10 × 倍率 2</text></div>
+        <div class="row"><text class="row-name">两对</text><text class="row-val">筹码 20 × 倍率 2</text></div>
+        <div class="row"><text class="row-name">三条</text><text class="row-val">筹码 30 × 倍率 3</text></div>
+        <div class="row"><text class="row-name">顺子</text><text class="row-val">筹码 30 × 倍率 4</text></div>
+        <div class="row"><text class="row-name">同花</text><text class="row-val">筹码 35 × 倍率 4</text></div>
+        <div class="row"><text class="row-name">葫芦</text><text class="row-val">筹码 40 × 倍率 4</text></div>
+        <div class="row"><text class="row-name">四条</text><text class="row-val">筹码 60 × 倍率 7</text></div>
+        <div class="row"><text class="row-name">同花顺</text><text class="row-val">筹码 100 × 倍率 8</text></div>
+        <div class="row"><text class="row-name">皇家同花顺</text><text class="row-val">筹码 100 × 倍率 8</text></div>
+
+        <text class="h">小丑牌（过关三选一）</text>
+        <div class="row"><text class="row-name">小丑的诡计</text><text class="row-val">对子及以上 +4 倍率</text></div>
+        <div class="row"><text class="row-name">红心皇后</text><text class="row-val">每张红桃 +12 筹码</text></div>
+        <div class="row"><text class="row-name">黑桃之刃</text><text class="row-val">每张黑桃 +3 倍率</text></div>
+        <div class="row"><text class="row-name">幸运七</text><text class="row-val">含 7 时 +7 倍率</text></div>
+        <div class="row"><text class="row-name">双倍欢乐</text><text class="row-val">两对时倍率 ×2</text></div>
+        <div class="row"><text class="row-name">方块商人</text><text class="row-val">每张方块 +15 筹码</text></div>
+        <div class="row"><text class="row-name">同花大师</text><text class="row-val">同花 +30 筹码且 ×2</text></div>
+        <div class="row"><text class="row-name">小丑王</text><text class="row-val">每次出牌 +50 筹码</text></div>
+
+        <text class="h">提示</text>
+        <text class="p">小丑栏最多持有 5 张，效果可叠加。盲注目标逐轮递增，看看你能闯到第几轮！</text>
+
+        <input class="btn" type="button" value="返回" onclick="goBack" />
+      </div>
+    </scroll>
+  </div>
+</template>
+
+<style>
+.page {
+  flex-direction: column;
+  background-color: #10121e;
+}
+
+.scroll-area {
+  width: 480px;
+  height: 466px;
+}
+
+.content {
+  flex-direction: column;
+  padding: 48px 36px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffd75e;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.h {
+  font-size: 24px;
+  font-weight: bold;
+  color: #7ee787;
+  margin-top: 16px;
+}
+
+.p {
+  font-size: 20px;
+  color: #cccccc;
+  margin-top: 6px;
+}
+
+.row {
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.row-name {
+  font-size: 20px;
+  color: #ffffff;
+}
+
+.row-val {
+  font-size: 18px;
+  color: #999999;
+}
+
+.btn {
+  width: 240px;
+  height: 46px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border-radius: 23px;
+  background-color: #2a2d45;
+  font-size: 22px;
+  color: #ffffff;
+  text-align: center;
+  align-self: center;
+}
+</style>
+
+<script>
+import router from '@system.router'
+
+export default {
+  private: {},
+  goBack() {
+    router.back()
+  }
+}
+</script>

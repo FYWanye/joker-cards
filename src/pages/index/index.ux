@@ -1,0 +1,792 @@
+<template>
+  <div class="page">
+    <!-- 视图：主菜单 -->
+    <div if="{{view === 'menu'}}" class="view">
+      <image src="/common/logo.png" class="logo" alt="blank" />
+      <text class="title">小丑牌</text>
+      <text class="subtitle">腕上构筑 · 扑克肉鸽</text>
+      <input class="btn btn-primary" type="button" value="开始游戏" onclick="startGame" />
+      <input class="btn" type="button" value="玩法规则" onclick="goRules" />
+      <text class="best-text">最高分 {{bestScore}}</text>
+    </div>
+
+    <!-- 视图：对局 -->
+    <div if="{{view === 'game'}}" class="view">
+      <div class="info-row">
+        <text class="info-text">盲注 {{round}}</text>
+        <text class="info-text">出牌 {{handsLeft}}</text>
+        <text class="info-text">弃牌 {{discardsLeft}}</text>
+      </div>
+      <div class="score-row">
+        <text class="score-big">{{roundScore}}</text>
+        <text class="score-target">/ {{target}}</text>
+      </div>
+      <div class="preview-row">
+        <text class="preview-name">{{handName}}</text>
+        <text class="preview-math">{{handChipText}} × {{handMultText}}</text>
+      </div>
+      <div class="joker-row">
+        <div for="{{jokers}}" tid="id" class="joker-slot">
+          <image src="{{$item.icon}}" class="joker-icon" alt="blank" />
+          <text class="joker-name">{{$item.name}}</text>
+        </div>
+        <text if="{{jokers.length === 0}}" class="joker-empty">尚未拥有小丑牌</text>
+      </div>
+      <div class="hand-row">
+        <div for="{{hand}}" tid="id" class="hand-slot" onclick="toggleCard($item)">
+          <image if="{{$item.selected}}" src="{{$item.img}}" class="card-img card-img-on" alt="blank" />
+          <image if="{{!$item.selected}}" src="{{$item.img}}" class="card-img" alt="blank" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <input class="btn btn-play" type="button" value="出牌" onclick="playHand" />
+        <input class="btn btn-discard" type="button" value="弃牌" onclick="discardCards" />
+      </div>
+    </div>
+
+    <!-- 视图：小丑三选一 -->
+    <div if="{{view === 'reward'}}" class="view">
+      <text class="title-s">盲注突破！</text>
+      <text class="subtitle">选择一张小丑牌</text>
+      <div for="{{rewardChoices}}" tid="id" class="choice-item" onclick="pickJoker($item)">
+        <image src="{{$item.icon}}" class="choice-icon" alt="blank" />
+        <div class="choice-text">
+          <text class="choice-name">{{$item.name}}</text>
+          <text class="choice-desc">{{$item.desc}}</text>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图：结算 -->
+    <div if="{{view === 'over'}}" class="view">
+      <text class="title-s">游戏结束</text>
+      <text class="over-score">{{totalScore}}</text>
+      <text class="over-info">到达盲注 {{overRound}}　最高分 {{bestScore}}</text>
+      <input class="btn btn-primary" type="button" value="再来一局" onclick="startGame" />
+      <input class="btn" type="button" value="返回菜单" onclick="backToMenu" />
+    </div>
+  </div>
+</template>
+
+<style>
+.page {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #10121e;
+}
+
+.view {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #ffd75e;
+}
+
+.title-s {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffd75e;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: #999999;
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+
+.best-text {
+  font-size: 20px;
+  color: #999999;
+  margin-top: 16px;
+}
+
+.btn {
+  width: 240px;
+  height: 46px;
+  margin-top: 10px;
+  border-radius: 23px;
+  background-color: #2a2d45;
+  font-size: 22px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: #e8b33b;
+  color: #1a1a2e;
+  font-weight: bold;
+}
+
+.info-row {
+  flex-direction: row;
+  justify-content: space-between;
+  width: 380px;
+}
+
+.info-text {
+  font-size: 20px;
+  color: #999999;
+}
+
+.score-row {
+  flex-direction: row;
+  align-items: baseline;
+  margin-top: 2px;
+}
+
+.score-big {
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.score-target {
+  font-size: 22px;
+  color: #999999;
+  margin-left: 8px;
+}
+
+.preview-row {
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.preview-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #7ee787;
+}
+
+.preview-math {
+  font-size: 18px;
+  color: #999999;
+}
+
+.joker-row {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
+  height: 52px;
+}
+
+.joker-slot {
+  flex-direction: column;
+  align-items: center;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.joker-icon {
+  width: 26px;
+  height: 38px;
+}
+
+.joker-name {
+  font-size: 14px;
+  color: #ffd75e;
+}
+
+.joker-empty {
+  font-size: 18px;
+  color: #555566;
+}
+
+.hand-row {
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  height: 116px;
+  margin-top: 4px;
+}
+
+.hand-slot {
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+.card-img {
+  width: 62px;
+  height: 90px;
+  border-radius: 6px;
+}
+
+.card-img-on {
+  margin-bottom: 12px;
+  border-width: 2px;
+  border-color: #ffd75e;
+}
+
+.btn-row {
+  flex-direction: row;
+  justify-content: space-between;
+  width: 320px;
+  margin-top: 10px;
+}
+
+.btn-play {
+  width: 150px;
+  background-color: #e8b33b;
+  color: #1a1a2e;
+  font-weight: bold;
+}
+
+.btn-discard {
+  width: 150px;
+}
+
+.choice-item {
+  flex-direction: row;
+  align-items: center;
+  width: 360px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background-color: #1c2038;
+}
+
+.choice-icon {
+  width: 34px;
+  height: 48px;
+  margin-right: 12px;
+}
+
+.choice-text {
+  flex-direction: column;
+  flex: 1;
+}
+
+.choice-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffd75e;
+}
+
+.choice-desc {
+  font-size: 17px;
+  color: #cccccc;
+  margin-top: 2px;
+}
+
+.over-score {
+  font-size: 56px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-top: 6px;
+}
+
+.over-info {
+  font-size: 20px;
+  color: #999999;
+  margin-bottom: 12px;
+}
+</style>
+
+<script>
+import router from '@system.router'
+import storage from '@system.storage'
+import audio from '@system.audio'
+import vibrator from '@system.vibrator'
+import prompt from '@system.prompt'
+
+const BEST_KEY = 'joker_best_score'
+const SUITS = ['clubs', 'diamonds', 'hearts', 'spades']
+const RANK_LABELS = { 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: 'J', 12: 'Q', 13: 'K', 14: 'A' }
+const RANK_FILES = { 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: 'jack', 12: 'queen', 13: 'king', 14: 'ace' }
+const HAND_TABLE = [
+  { key: 'high', name: '高牌', chips: 5, mult: 1 },
+  { key: 'pair', name: '对子', chips: 10, mult: 2 },
+  { key: 'two-pair', name: '两对', chips: 20, mult: 2 },
+  { key: 'three', name: '三条', chips: 30, mult: 3 },
+  { key: 'straight', name: '顺子', chips: 30, mult: 4 },
+  { key: 'flush', name: '同花', chips: 35, mult: 4 },
+  { key: 'full-house', name: '葫芦', chips: 40, mult: 4 },
+  { key: 'four', name: '四条', chips: 60, mult: 7 },
+  { key: 'straight-flush', name: '同花顺', chips: 100, mult: 8 },
+  { key: 'royal', name: '皇家同花顺', chips: 100, mult: 8 }
+]
+const JOKER_POOL = [
+  { id: 'J01', name: '小丑的诡计', desc: '对子及以上牌型 +4 倍率', icon: '/common/images/cards/red_joker.png' },
+  { id: 'J02', name: '红心皇后', desc: '每张红桃 +12 筹码', icon: '/common/images/cards/red_joker.png' },
+  { id: 'J03', name: '黑桃之刃', desc: '每张黑桃 +3 倍率', icon: '/common/images/cards/black_joker.png' },
+  { id: 'J04', name: '幸运七', desc: '手牌含 7 时 +7 倍率', icon: '/common/images/cards/red_joker.png' },
+  { id: 'J05', name: '双倍欢乐', desc: '两对时倍率 ×2', icon: '/common/images/cards/black_joker.png' },
+  { id: 'J06', name: '方块商人', desc: '每张方块 +15 筹码', icon: '/common/images/cards/red_joker.png' },
+  { id: 'J07', name: '同花大师', desc: '同花时 +30 筹码且 ×2 倍率', icon: '/common/images/cards/black_joker.png' },
+  { id: 'J08', name: '小丑王', desc: '每次出牌 +50 筹码', icon: '/common/images/cards/red_joker.png' }
+]
+const AUDIO_SRC = {
+  click: '/common/audio/click.mp3',
+  select: '/common/audio/select.mp3',
+  play: '/common/audio/play.mp3',
+  discard: '/common/audio/discard.mp3',
+  shuffle: '/common/audio/shuffle.mp3',
+  chips: '/common/audio/chips.mp3',
+  reward: '/common/audio/reward.mp3',
+  win: '/common/audio/win.mp3',
+  lose: '/common/audio/lose.mp3'
+}
+
+let deckPool = []
+let timerIds = []
+let audioBroken = false
+
+function buildDeck() {
+  const deck = []
+  for (let s = 0; s < SUITS.length; s++) {
+    for (let r = 2; r <= 14; r++) {
+      const suit = SUITS[s]
+      deck.push({
+        id: RANK_FILES[r] + '-' + suit,
+        rank: r,
+        rankLabel: RANK_LABELS[r],
+        suit: suit,
+        img: '/common/images/cards/' + RANK_FILES[r] + '_of_' + suit + '.png',
+        chips: r === 14 ? 11 : (r > 10 ? 10 : r),
+        selected: false
+      })
+    }
+  }
+  return deck
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = tmp
+  }
+  return arr
+}
+
+function drawCards(n) {
+  const out = []
+  for (let i = 0; i < n; i++) {
+    if (deckPool.length === 0) {
+      deckPool = shuffle(buildDeck())
+    }
+    const card = deckPool.pop()
+    card.selected = false
+    out.push(card)
+  }
+  return out
+}
+
+function isStraight(ranks) {
+  const sorted = ranks.slice().sort(function (a, b) { return a - b })
+  const uniq = []
+  for (let i = 0; i < sorted.length; i++) {
+    if (uniq.indexOf(sorted[i]) === -1) uniq.push(sorted[i])
+  }
+  if (uniq.length !== 5) return false
+  if (uniq[4] - uniq[0] === 4) return true
+  return uniq[0] === 2 && uniq[1] === 3 && uniq[2] === 4 && uniq[3] === 5 && uniq[4] === 14
+}
+
+function evaluateHand(cards) {
+  const n = cards.length
+  if (n === 0) return HAND_TABLE[0]
+  const counts = {}
+  for (let i = 0; i < n; i++) {
+    const r = cards[i].rank
+    counts[r] = (counts[r] || 0) + 1
+  }
+  const countVals = []
+  for (const k in counts) countVals.push(counts[k])
+  countVals.sort(function (a, b) { return b - a })
+  const isFlush = n === 5 && cards[0].suit === cards[1].suit && cards[1].suit === cards[2].suit &&
+    cards[2].suit === cards[3].suit && cards[3].suit === cards[4].suit
+  const isSeq = n === 5 && isStraight(cards.map(function (c) { return c.rank }))
+  if (isSeq && isFlush) {
+    const rs = cards.map(function (c) { return c.rank }).sort(function (a, b) { return a - b })
+    return (rs[0] === 10 && rs[4] === 14) ? HAND_TABLE[9] : HAND_TABLE[8]
+  }
+  if (countVals[0] === 4) return HAND_TABLE[7]
+  if (countVals[0] === 3 && countVals[1] === 2) return HAND_TABLE[6]
+  if (isFlush) return HAND_TABLE[5]
+  if (isSeq) return HAND_TABLE[4]
+  if (countVals[0] === 3) return HAND_TABLE[3]
+  if (countVals[0] === 2 && countVals[1] === 2) return HAND_TABLE[2]
+  if (countVals[0] === 2) return HAND_TABLE[1]
+  return HAND_TABLE[0]
+}
+
+function countSuit(cards, suit) {
+  let n = 0
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].suit === suit) n++
+  }
+  return n
+}
+
+function applyJokers(jokers, cards, base) {
+  let chips = 0
+  let multAdd = 0
+  let multMul = 1
+  for (let i = 0; i < jokers.length; i++) {
+    const id = jokers[i].id
+    if (id === 'J01' && base.key !== 'high') multAdd += 4
+    if (id === 'J02') chips += 12 * countSuit(cards, 'hearts')
+    if (id === 'J03') multAdd += 3 * countSuit(cards, 'spades')
+    if (id === 'J04') {
+      for (let j = 0; j < cards.length; j++) {
+        if (cards[j].rank === 7) { multAdd += 7; break }
+      }
+    }
+    if (id === 'J05' && base.key === 'two-pair') multMul *= 2
+    if (id === 'J06') chips += 15 * countSuit(cards, 'diamonds')
+    if (id === 'J07' && (base.key === 'flush' || base.key === 'straight-flush' || base.key === 'royal')) {
+      chips += 30
+      multMul *= 2
+    }
+    if (id === 'J08') chips += 50
+  }
+  return { chips: chips, multAdd: multAdd, multMul: multMul }
+}
+
+function calcTarget(round) {
+  return Math.ceil((300 * Math.pow(2.2, round - 1)) / 10) * 10
+}
+
+export default {
+  private: {
+    view: 'menu',
+    round: 1,
+    target: 300,
+    roundScore: 0,
+    totalScore: 0,
+    handsLeft: 4,
+    discardsLeft: 3,
+    hand: [],
+    jokers: [],
+    rewardChoices: [],
+    handName: '未选择',
+    handChipText: '筹码 0',
+    handMultText: '倍率 0',
+    bestScore: 0,
+    overRound: 0,
+    scoring: false
+  },
+
+  onInit() {
+    this.loadBestScore()
+    audio.onerror = function () {
+      audioBroken = true
+    }
+  },
+
+  onDestroy() {
+    for (let i = 0; i < timerIds.length; i++) {
+      clearTimeout(timerIds[i])
+    }
+    timerIds = []
+    audio.onerror = null
+  },
+
+  schedule(fn, ms) {
+    const id = setTimeout(fn, ms)
+    timerIds.push(id)
+    return id
+  },
+
+  loadBestScore() {
+    const self = this
+    storage.get({
+      key: BEST_KEY,
+      success: function (data) {
+        if (data) {
+          const n = parseInt(data, 10)
+          self.bestScore = isNaN(n) ? 0 : n
+        }
+      },
+      fail: function (data, code) {
+        console.error('load best score fail: code=' + code)
+      }
+    })
+  },
+
+  saveBestScore() {
+    if (this.totalScore <= this.bestScore) return
+    this.bestScore = this.totalScore
+    storage.set({
+      key: BEST_KEY,
+      value: String(this.totalScore),
+      fail: function (data, code) {
+        console.error('save best score fail: code=' + code)
+      }
+    })
+  },
+
+  playSound(name) {
+    if (audioBroken) return
+    try {
+      audio.src = AUDIO_SRC[name]
+      audio.play()
+    } catch (e) {
+      audioBroken = true
+      console.error('audio fail: ' + e)
+    }
+  },
+
+  buzz(mode) {
+    try {
+      vibrator.vibrate({ mode: mode })
+    } catch (e) {
+      console.error('vibrate fail: ' + e)
+    }
+  },
+
+  toast(msg) {
+    try {
+      prompt.showToast({ message: msg, duration: 1500 })
+    } catch (e) {
+      console.error('toast fail: ' + e)
+    }
+  },
+
+  goRules() {
+    this.playSound('click')
+    router.push({ uri: '/pages/detail' })
+  },
+
+  startGame() {
+    if (this.scoring) return
+    this.playSound('click')
+    this.totalScore = 0
+    this.round = 1
+    this.target = calcTarget(1)
+    this.jokers.splice(0, this.jokers.length)
+    this.rewardChoices.splice(0, this.rewardChoices.length)
+    this.startRound()
+  },
+
+  startRound() {
+    this.roundScore = 0
+    this.handsLeft = 4
+    this.discardsLeft = 3
+    deckPool = shuffle(buildDeck())
+    this.hand.splice(0, this.hand.length)
+    const draws = drawCards(8)
+    for (let i = 0; i < draws.length; i++) {
+      this.hand.push(draws[i])
+    }
+    this.updatePreview()
+    this.view = 'game'
+    this.playSound('shuffle')
+  },
+
+  toggleCard(card) {
+    if (this.scoring) return
+    let selected = 0
+    for (let i = 0; i < this.hand.length; i++) {
+      if (this.hand[i].selected) selected++
+    }
+    if (!card.selected && selected >= 5) {
+      this.toast('最多选择 5 张')
+      return
+    }
+    card.selected = !card.selected
+    this.playSound('select')
+    this.updatePreview()
+  },
+
+  updatePreview() {
+    const sel = []
+    for (let i = 0; i < this.hand.length; i++) {
+      if (this.hand[i].selected) sel.push(this.hand[i])
+    }
+    if (sel.length === 0) {
+      this.handName = '未选择'
+      this.handChipText = '筹码 0'
+      this.handMultText = '倍率 0'
+      return
+    }
+    const r = this.calcScore(sel)
+    this.handName = r.name
+    this.handChipText = '筹码 ' + r.chips
+    this.handMultText = '倍率 ' + r.mult
+  },
+
+  calcScore(cards) {
+    const base = evaluateHand(cards)
+    let chips = base.chips
+    for (let i = 0; i < cards.length; i++) {
+      chips += cards[i].chips
+    }
+    let mult = base.mult
+    const bonus = applyJokers(this.jokers, cards, base)
+    chips += bonus.chips
+    mult += bonus.multAdd
+    mult = mult * bonus.multMul
+    return { name: base.name, chips: chips, mult: mult, total: Math.round(chips * mult) }
+  },
+
+  playHand() {
+    if (this.scoring) return
+    const sel = []
+    for (let i = 0; i < this.hand.length; i++) {
+      if (this.hand[i].selected) sel.push(this.hand[i])
+    }
+    if (sel.length === 0) {
+      this.toast('请先选择要出的牌')
+      return
+    }
+    if (this.handsLeft <= 0) {
+      this.toast('出牌次数已用完')
+      return
+    }
+    this.scoring = true
+    this.handsLeft = this.handsLeft - 1
+    const result = this.calcScore(sel)
+    this.playSound('play')
+    this.buzz('short')
+    this.animateScore(result.total)
+  },
+
+  animateScore(gain) {
+    const steps = 5
+    const chunk = Math.ceil(gain / steps)
+    let added = 0
+    const self = this
+    const tick = function () {
+      const step = Math.min(chunk, gain - added)
+      added += step
+      self.roundScore = self.roundScore + step
+      self.totalScore = self.totalScore + step
+      if (added < gain) {
+        self.schedule(tick, 110)
+      } else {
+        self.afterPlay()
+      }
+    }
+    this.playSound('chips')
+    this.schedule(tick, 80)
+  },
+
+  afterPlay() {
+    this.removeSelected()
+    const need = 8 - this.hand.length
+    if (need > 0) {
+      const draws = drawCards(need)
+      for (let i = 0; i < draws.length; i++) {
+        this.hand.push(draws[i])
+      }
+    }
+    this.updatePreview()
+    this.scoring = false
+    if (this.roundScore >= this.target) {
+      this.roundWon()
+    } else if (this.handsLeft <= 0) {
+      this.gameOver()
+    }
+  },
+
+  removeSelected() {
+    for (let i = this.hand.length - 1; i >= 0; i--) {
+      if (this.hand[i].selected) this.hand.splice(i, 1)
+    }
+  },
+
+  discardCards() {
+    if (this.scoring) return
+    if (this.discardsLeft <= 0) {
+      this.toast('弃牌次数已用完')
+      return
+    }
+    let selected = 0
+    for (let i = 0; i < this.hand.length; i++) {
+      if (this.hand[i].selected) selected++
+    }
+    if (selected === 0) {
+      this.toast('请先选择要弃的牌')
+      return
+    }
+    this.discardsLeft = this.discardsLeft - 1
+    this.removeSelected()
+    const draws = drawCards(selected)
+    for (let i = 0; i < draws.length; i++) {
+      this.hand.push(draws[i])
+    }
+    this.updatePreview()
+    this.playSound('discard')
+  },
+
+  roundWon() {
+    this.playSound('win')
+    this.buzz('short')
+    if (this.jokers.length >= 5) {
+      this.toast('小丑栏已满，进入下一轮')
+      this.nextRound()
+      return
+    }
+    this.makeRewardChoices()
+    this.view = 'reward'
+    this.playSound('reward')
+  },
+
+  makeRewardChoices() {
+    const owned = {}
+    for (let i = 0; i < this.jokers.length; i++) {
+      owned[this.jokers[i].id] = true
+    }
+    const pool = []
+    for (let i = 0; i < JOKER_POOL.length; i++) {
+      if (!owned[JOKER_POOL[i].id]) pool.push(JOKER_POOL[i])
+    }
+    shuffle(pool)
+    this.rewardChoices.splice(0, this.rewardChoices.length)
+    const n = Math.min(3, pool.length)
+    for (let i = 0; i < n; i++) {
+      this.rewardChoices.push({
+        id: pool[i].id,
+        name: pool[i].name,
+        desc: pool[i].desc,
+        icon: pool[i].icon
+      })
+    }
+  },
+
+  pickJoker(item) {
+    if (this.scoring) return
+    this.playSound('click')
+    this.jokers.push({ id: item.id, name: item.name, desc: item.desc, icon: item.icon })
+    this.nextRound()
+  },
+
+  nextRound() {
+    this.round = this.round + 1
+    this.target = calcTarget(this.round)
+    this.startRound()
+  },
+
+  gameOver() {
+    this.playSound('lose')
+    this.buzz('long')
+    this.overRound = this.round
+    this.saveBestScore()
+    this.view = 'over'
+  },
+
+  backToMenu() {
+    this.playSound('click')
+    this.view = 'menu'
+  }
+}
+</script>
